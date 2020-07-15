@@ -1,0 +1,79 @@
+# Tests for poly.exe
+# =================
+
+.. test: Test --version
+
+    $ ./poly.exe --version
+    1.0
+
+.. test: Test --usage
+
+    $ ./poly.exe --usage
+    ./poly.exe --usage
+    ./poly.exe --version
+    ./poly.exe COEFFICIENTS...
+
+.. test: Test no arguments
+
+    $ ./poly.exe
+    (stderr): ./poly.exe --usage
+    (stderr): ./poly.exe --version
+    (stderr): ./poly.exe COEFFICIENTS...
+    (return): 1
+
+.. test: Polynomials with one integer root
+
+    $ ./poly.exe 1
+    No integer roots
+    $ ./poly.exe 1 1
+    -1
+    $ ./poly.exe 1 1 1
+    No integer roots
+    $ ./poly.exe 1 1 1 1
+    -1
+    $ ./poly.exe 1 -2 1
+    1
+    $ ./poly.exe 1 3 2 6
+    -3
+    $ ./poly.exe 2 14 -4 -28
+    -7
+
+.. test: Polynomials with multiple roots
+
+  $ ./poly.exe 2 10 -28
+  2 -7
+  $ ./poly.exe 1 0 -4
+  2 -2
+  $ ./poly.exe 1 -13 36
+  4 9
+  $ ./poly.exe 1 0 -13 0 36
+  2 -2 3 -3
+  $ ./poly.exe 1 6 -9 -14
+  -1 2 -7
+
+.. test: Polynomials with zero as root
+
+  $ ./poly.exe 1 0
+  0
+  $ ./poly.exe 1 1 0
+  0 -1
+  $ ./poly.exe 1 1 0 0
+  0 -1
+  $ ./poly.exe 1 2 1 0
+  0 -1
+  $ ./poly.exe 1 0 -13 0 36 0
+  0 2 -2 3 -3
+
+.. test: Roots needing bigint calculations
+
+  $ ./poly.exe 1024 10240 46080 122880 215040 258048 215040 122880 46080 10240 1024
+  -1
+  $ ./poly.exe 1024 12288 63488 184320 322560 319488 86016 -221184 -353280 -266240 -116736 -28672 -3072
+  1 -1 -3
+  $ ./poly.exe 1024 12288 63488 184320 322560 319488 86016 -221184 -353280 -266240 -116736 -28672 -3072 0
+  0 1 -1 -3
+  $ ./poly.exe 1024 15360 103680 414720 1088640 1959552 2449440 2099520 1180980 393660 59049
+  No integer roots
+  $ ./poly.exe 1 -87 -3001 179487
+  37 -49 99
+
