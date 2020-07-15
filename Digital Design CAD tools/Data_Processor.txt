@@ -1,0 +1,290 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.common_pack.all;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+
+entity dataConsume is
+    Port ( 
+        clk: in std_logic;
+		reset: in std_logic; -- synchronous reset
+		start: in std_logic; -- goes high to signal data transfer
+		numWords_bcd: in BCD_ARRAY_TYPE(2 downto 0);
+		ctrlIn: in std_logic;
+		ctrlOut: out std_logic;
+		data: in std_logic_vector(7 downto 0);
+		dataReady: out std_logic;
+		byte: out std_logic_vector(7 downto 0);
+		seqDone: out std_logic;
+		maxIndex: out BCD_ARRAY_TYPE(2 downto 0);
+		dataResults: out CHAR_ARRAY_TYPE(0 to RESULT_BYTE_NUM-1) -- index 3 holds the peak
+	);
+end dataConsume;
+
+architecture Behavioral of dataConsume is
+    type state_type is (IDLE, S0, LOAD_VALUE,BCD_1,LOADED_MAXINDEX, S1, S2, S3,S4, S5, SequenceDone);
+    signal currentState, nextState : state_type;
+    signal COUNTER, TOTAL, MAX_INDEX_IN_INTEGER, max_index_counter: integer range 0 to 999;
+    signal digit: integer range -1 to 2;
+    signal RESET_COUNTER, ENABLE, ENABLE_MAXINDEX_COUNTER, reset_max_index_counter, MAXINDEX_LOADED_SUCCESS, reset_dataResults, reset_comparison: std_logic;
+    signal initial : std_logic_vector(7 downto 0);
+    signal Start_Transmission, RESET_BCD, ENABLE_BCD_COUNTER, MAXINDEX_OUTPUT_FIRST_ORDER, MAXINDEX_OUTPUT_SECOND_ORDER, MAXINDEX_OUTPUT_THIRD_ORDER: std_logic;
+    signal seven_bytes : CHAR_ARRAY_TYPE(0 to RESULT_BYTE_NUM-1);
+    signal first_order_of_units, second_order_of_units, third_order_of_units : integer range -1 to 9;
+
+BEGIN
+state_logic: process(nextState, currentState, start, Start_Transmission, RESET_COUNTER, ctrlIn, data, RESET_BCD, ENABLE_BCD_COUNTER)
+BEGIN
+     CASE currentState is 
+        WHEN IDLE =>
+            reset_max_index_counter <= '1';
+            RESET_BCD <= '1';
+            Seqdone <= '0';
+            reset_comparison <= '1';
+            ENABLE_MAXINDEX_COUNTER <= '0';
+            MAXINDEX_OUTPUT_FIRST_ORDER <= '0';
+            MAXINDEX_OUTPUT_SECOND_ORDER <= '0';
+            MAXINDEX_OUTPUT_THIRD_ORDER <= '0';
+            if start = '1' THEN
+                RESET_COUNTER <= '1';
+                nextState <= LOAD_VALUE;
+            elsif start = '0' THEN
+                nextState <= IDLE;
+            end if;
+        
+        WHEN LOAD_VALUE =>
+            reset_comparison <= '1';
+            reset_dataResults <= '1';
+            RESET_BCD <= '0';
+            ENABLE_BCD_COUNTER <= '0';
+            if digit = -1 then
+                reset_dataResults <= '1';
+                nextState <= S0;
+            elsif digit >= 0 THEN
+                nextState <= BCD_1;
+            end if;
+            
+        WHEN BCD_1 =>
+            reset_comparison <= '1';
+            reset_dataResults <= '1';
+            ENABLE_BCD_COUNTER <= '1';
+            RESET_BCD <= '0';
+            if DIGIT >= 0 THEN
+                enable_BCD_counter <= '1';
+                nextState <= LOAD_VALUE;     
+            end if;
+            
+        WHEN S0 =>
+            reset_comparison <= '0';
+            reset_dataResults <= '0';
+            RESET_COUNTER <= '0';
+            Start_Transmission <= '1';
+            DataReady <= '1';
+            Byte <= data;
+            if COUNTER = TOTAL THEN
+                Start_Transmission <= '0';
+                RESET_COUNTER <= '1';
+                nextState <= S1;
+            else
+                nextState <= S0;
+            end if;
+            
+        WHEN LOADED_MAXINDEX =>
+            if MAXINDEX_LOADED_SUCCESS = '1' then
+                first_order_of_units <= -1;
+                second_order_of_units <= -1;
+                third_order_of_units <= -1;
+                nextState <= S1;
+            end if;
+            
+        WHEN S1 =>
+            DataReady <= '0';
+            Start_Transmission <= '0';
+            reset_max_index_counter <= '0';
+            MAXINDEX_OUTPUT_FIRST_ORDER <= '1';  
+            first_order_of_units <= MAX_INDEX_IN_INTEGER / 100;
+            ENABLE_MAXINDEX_COUNTER <= '1';
+            nextState <= S2;
+        
+        WHEN S2 =>
+            first_order_of_units <= -1;
+            ENABLE_MAXINDEX_COUNTER <= '0';
+            MAXINDEX_OUTPUT_FIRST_ORDER <= '0';
+            MAXINDEX_OUTPUT_SECOND_ORDER <= '1'; 
+            second_order_of_units <= MAX_INDEX_IN_INTEGER / 10;
+            ENABLE_MAXINDEX_COUNTER <= '1';
+            nextState <= S3;
+        
+        WHEN S3 =>
+            second_order_of_units <= -1;
+            ENABLE_MAXINDEX_COUNTER <= '0';
+            MAXINDEX_OUTPUT_SECOND_ORDER <= '0'; 
+            MAXINDEX_OUTPUT_THIRD_ORDER <= '1'; 
+            third_order_of_units <= MAX_INDEX_IN_INTEGER / 1;
+            ENABLE_MAXINDEX_COUNTER <= '1';
+            nextState <= S4;
+       
+        WHEN S4 =>
+            third_order_of_units <= -1;
+            ENABLE_MAXINDEX_COUNTER <= '0';
+            MAXINDEX_OUTPUT_THIRD_ORDER <= '0';
+            nextState <= SequenceDone;
+     
+        WHEN SequenceDone =>
+            Seqdone <= '1';
+            if start = '1' then
+                nextState <= IDLE;
+            end if;
+        
+        WHEN OTHERS =>
+            nextState <= IDLE;
+     END CASE;
+END PROCESS;
+
+STATE_FLIPFLOPS : PROCESS(clk, reset)
+begin
+    if (reset = '1') then
+        currentState <= IDLE;
+    elsif rising_edge (clk) then
+        currentState <= nextState;
+    end if;	
+end process;
+
+Control_LOGIC : PROCESS(clk, reset, ENABLE, ctrlIn)
+BEGIN
+    if reset = '1' THEN
+        ctrlOut <= '0';
+    elsif reset = '0' and ctrlIn = '1' and Start_Transmission = '1' THEN
+        ctrlOut <= '0'; 
+        ENABLE <= '0';
+    elsif reset = '0' and ctrlIn = '0' and Start_Transmission = '1' THEN
+        ctrlOut <= '1';
+        ENABLE <= '1';
+    end if;
+    
+END PROCESS;
+
+COUNTER_LOGIC : PROCESS(clk, reset)
+BEGIN
+    if RESET_COUNTER = '1' THEN
+        COUNTER <= 0;
+    elsif rising_edge(clk) then
+        if ENABLE = '1' and ctrlIn = '0' then
+            COUNTER <= COUNTER + 1;
+        elsif ENABLE = '0' and ctrlIn = '1' then
+            COUNTER <= COUNTER + 1;
+        end if;
+    end if;
+END PROCESS;
+
+COMPARISON_LOGIC : PROCESS(clk, reset)
+BEGIN
+    if reset = '1' or reset_comparison = '1' then
+        MAX_INDEX_IN_INTEGER <= 0;
+        initial <= "00000000";
+    elsif rising_edge(clk) then
+        if data > initial THEN
+            initial <= data;
+            MAX_INDEX_IN_INTEGER <= COUNTER;
+        elsif MAXINDEX_OUTPUT_FIRST_ORDER = '1' then
+            MAX_INDEX_IN_INTEGER <= MAX_INDEX_IN_INTEGER - first_order_of_units * 100;
+        elsif MAXINDEX_OUTPUT_SECOND_ORDER = '1' then
+            MAX_INDEX_IN_INTEGER <= MAX_INDEX_IN_INTEGER - second_order_of_units * 10;
+        elsif MAXINDEX_OUTPUT_THIRD_ORDER = '1' then
+            MAX_INDEX_IN_INTEGER <= MAX_INDEX_IN_INTEGER - third_order_of_units * 1;
+            MAXINDEX_LOADED_SUCCESS <= '1';
+        end if;
+    end if;
+END PROCESS;
+
+MAX_INDEX_OUTPUT : PROCESS(clk, reset)
+BEGIN
+    if reset = '1' or reset_max_index_counter = '1' then
+        max_index_counter <= 2;
+        maxIndex <= (X"0", X"0", X"0");
+    elsif rising_edge(clk) then
+        if (MAXINDEX_OUTPUT_FIRST_ORDER = '1' or  MAXINDEX_OUTPUT_SECOND_ORDER = '1' or MAXINDEX_OUTPUT_THIRD_ORDER = '1') and ENABLE_MAXINDEX_COUNTER = '1' then
+            if first_order_of_units = 0 or second_order_of_units = 0 or third_order_of_units = 0 then
+                maxIndex(max_index_counter) <= X"0";
+            elsif first_order_of_units = 1 or second_order_of_units = 1 or third_order_of_units = 1 then
+                maxIndex(max_index_counter) <= X"1";
+            elsif first_order_of_units = 2 or second_order_of_units = 2 or third_order_of_units = 2 then
+                maxIndex(max_index_counter) <= X"2";
+            elsif first_order_of_units = 3 or second_order_of_units = 3 or third_order_of_units = 3 then
+                maxIndex(max_index_counter) <= X"3";
+            elsif first_order_of_units = 4 or second_order_of_units = 4 or third_order_of_units = 4 then
+                maxIndex(max_index_counter) <= X"4";
+            elsif first_order_of_units = 5 or second_order_of_units = 5 or third_order_of_units = 5 then
+                maxIndex(max_index_counter) <= X"5";
+            elsif first_order_of_units = 6 or second_order_of_units = 6 or third_order_of_units = 6 then
+                maxIndex(max_index_counter) <= X"6";
+            elsif first_order_of_units = 7 or second_order_of_units = 7 or third_order_of_units = 7 then
+                maxIndex(max_index_counter) <= X"7";
+            elsif first_order_of_units = 8 or second_order_of_units = 8 or third_order_of_units = 8 then
+                maxIndex(max_index_counter) <= X"8";
+            elsif first_order_of_units = 9 or second_order_of_units = 9 or third_order_of_units = 9 then
+                maxIndex(max_index_counter) <= X"9";
+            end if;
+            max_index_counter <= max_index_counter - 1;
+        end if;
+    end if;
+END PROCESS;
+
+COUNT_SEVEN_BYTES : PROCESS(clk, reset)
+BEGIN
+    if reset = '1' or reset_dataResults = '1' then
+        dataresults <= (X"00", X"00", X"00", X"00", X"00", X"00", X"00");
+        seven_bytes <= (X"00", X"00", X"00", X"00", X"00", X"00", X"00");
+    elsif reset = '0' then
+        if counter >= 0 and counter < 7 then
+            seven_bytes(counter) <= data;
+        elsif rising_edge(clk) and counter >= 7 then
+            seven_bytes(0) <= seven_bytes(1);
+            seven_bytes(1) <= seven_bytes(2);
+            seven_bytes(2) <= seven_bytes(3);
+            seven_bytes(3) <= seven_bytes(4);
+            seven_bytes(4) <= seven_bytes(5);
+            seven_bytes(5) <= seven_bytes(6);
+            seven_bytes(6) <= data;
+        elsif COUNTER = MAX_INDEX_IN_INTEGER + 4 THEN
+            dataresults <= seven_bytes;
+        end if;
+    end if;
+END PROCESS;
+
+NUMS_OF_BCD_DOWNCOUNTER : PROCESS(clk, reset, DIGIT, TOTAL)
+BEGIN
+    if (reset = '1') or RESET_BCD = '1' THEN
+        DIGIT <= 2;
+        TOTAL <= 0;
+    elsif rising_edge(clk) THEN
+        if ENABLE_BCD_COUNTER = '1' AND DIGIT >= 0 THEN
+            if numWords_bcd(DIGIT) = X"0" THEN
+                TOTAL <= TOTAL + 0 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"1" THEN
+                TOTAL <= TOTAL + 1 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"2" THEN
+                TOTAL <= TOTAL + 2 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"3" THEN
+                TOTAL <= TOTAL + 3 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"4" THEN
+                TOTAL <= TOTAL + 4 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"5" THEN
+                TOTAL <= TOTAL + 5 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"6" THEN
+                TOTAL <= TOTAL + 6 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"7" THEN
+                TOTAL <= TOTAL + 7 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"8" THEN
+                TOTAL <= TOTAL + 8 * (10 ** DIGIT);
+            elsif numWords_bcd(DIGIT) = X"9" THEN
+                TOTAL <= TOTAL + 9 * (10 ** DIGIT);
+            end if;
+            DIGIT <= DIGIT - 1;
+        end if;
+    END IF;      
+END PROCESS;
+
+
+END Behavioral;

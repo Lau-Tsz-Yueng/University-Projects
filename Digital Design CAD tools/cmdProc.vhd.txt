@@ -1,0 +1,303 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.common_pack.all;
+library UNISIM;
+use UNISIM.VCOMPONENTS.ALL;
+
+
+entity cmdProc is
+    port(
+	  clk: in std_logic;
+      reset: in std_logic;
+      rxnow: in std_logic; -- valid
+      rxData: in std_logic_vector (7 downto 0);
+      txData: out std_logic_vector (7 downto 0);
+      rxdone: out std_logic;
+      ovErr:  in std_logic;
+      framErr: in std_logic;
+      txnow: out std_logic; --valid
+      txdone: in std_logic;
+      start: out std_logic;
+      numWords_bcd: out BCD_ARRAY_TYPE(2 downto 0);
+      dataReady: in std_logic;
+      byte: in std_logic_vector(7 downto 0);
+      maxIndex: in BCD_ARRAY_TYPE(2 downto 0);
+      dataResults: in CHAR_ARRAY_TYPE(0 to RESULT_BYTE_NUM-1);
+      seqDone: in std_logic
+  );
+end cmdProc;
+
+architecture Behavioral of cmdProc is
+    type state_type is (IDLE, DETECT_A, DETECT_RANGE_FOR_Ns, S2, S3, S4, OUTPUT_PEAK_VALUE, OUTPUT_LIST_VALUE, S7, DESTINATION, LOAD_VALUE, OUTPUT_MAX_INDEX);
+    signal currentState, nextState: state_type;
+    signal counter_N, COUNTER_BYTE, INTEGER_STORED, TOTAL, maxindex_counter : integer range 0 to 999;
+    signal BCD : BCD_ARRAY_TYPE(2 downto 0);
+    signal txData_peak, txData_list, MAX_INDEX_8_bit: std_logic_vector(7 downto 0);
+    signal enable, start_list_values ,output_peak_values, output_maxindex, RESET_maxindex_counter: std_logic;
+    signal RESETcounter, enable_counter, list_resetcounter, list_enable, resetBCD, RESET_BYTE_COUNTER, ENABLE_BYTE_COUNTER, PRINT_OUTPUT,TX_SUCCESS: std_logic;
+    signal list_counter : integer range 0 to 7;
+    signal DATARESULTS_SIGNAL : CHAR_ARRAY_TYPE(0 to RESULT_BYTE_NUM-1);
+    signal MAXINDEX_SIGNAL: BCD_ARRAY_TYPE(2 downto 0);
+BEGIN
+
+
+state_logic: process(ovErr, framErr, nextState, currentState,rxData, rxnow, txdone , RESETcounter, enable_counter, counter_N, seqDone, dataresults, maxIndex)
+BEGIN
+
+    case currentState is 
+        WHEN IDLE =>
+            if rxnow = '1'  THEN
+                nextState <= DETECT_A;
+            else
+                nextState <= IDLE;
+            end if;
+               
+        WHEN DETECT_A =>
+             if (rxData = "01100001" or rxData = "01000001") and rxnow = '0' and txdone = '1' THEN 
+                    nextState <= LOAD_VALUE;
+             end if;
+             
+        WHEN LOAD_VALUE => -- AFTER detected A and now start count Ns 
+            enable_counter <= '0';
+            if counter_N = 0 THEN
+                nextState <= S2;
+            end if;
+            if rxnow = '1' and txdone = '1' THEN
+                nextState <= DETECT_RANGE_FOR_Ns;
+            end if;
+       
+        WHEN DETECT_RANGE_FOR_Ns =>
+            resetBCD <= '0';   
+            if (rxData < "00111010" and rxData > "00101111") and rxnow = '0' and txdone = '1' THEN -- IF Ns are in 0 ~ 9 integer range
+                RESETcounter <= '0';
+                if counter_N > 0 THEN
+                    RESETcounter <= '0';
+                    enable_counter <= '1';
+                    nextState <= LOAD_VALUE;     
+                end if;
+            elsif rxData > "00111010" or RxData < "00101111" THEN
+                RESETcounter <= '1';
+                nextState <= IDLE;
+            end if;
+          
+        WHEN S2 =>
+            resetBCD <= '1';  
+            nextState <= S3;
+          
+        WHEN S3 =>
+            DATARESULTS_SIGNAL <= dataresults;
+            MAXINDEX_SIGNAL <= maxIndex;
+            if seqDone = '1' THEN
+                nextState <= S4;
+            end if;
+            
+        WHEN S4 =>
+            RESETcounter <= '1';
+            if (rxData = ("01010000") or rxData = ("01100000")) and rxnow = '0' and txdone = '1' THEN --detec P or p
+                nextState <= OUTPUT_PEAK_VALUE;
+            elsif (rxData = ("01001100") or rxData = ("01101100")) and rxnow = '0' and txdone = '1' THEN -- detect L or l
+                 nextState <= OUTPUT_LIST_VALUE;
+            elsif (rxData = ("01100001") or rxData = ("01000001")) and rxnow = '0' and txdone = '1' THEN -- detect a or A
+                 nextState <= LOAD_VALUE; -- BACK TO S1
+            else
+                nextState <= S4;
+            end if;
+        
+        WHEN OUTPUT_PEAK_VALUE =>
+            output_peak_values <= '1';
+            nextState <= OUTPUT_MAX_INDEX;
+            
+        WHEN OUTPUT_MAX_INDEX =>
+            output_maxindex <= '1';
+            if maxindex_counter = 3 THEN
+                nextState <= DESTINATION;
+            else 
+                nextState <= OUTPUT_MAX_INDEX;
+            end if;
+            
+        WHEN OUTPUT_LIST_VALUE => 
+            list_resetcounter <= '0';
+            start_list_values <= '1';
+            list_enable <= '1';
+            if list_counter = 7 THEN
+                nextState <= DESTINATION;
+            end if;
+        
+        WHEN DESTINATION =>
+            nextState <= IDLE;
+            
+        WHEN OTHERS => 
+            nextState <= IDLE;
+    end case;
+end process;
+
+
+STATE_FLIPFLOPS : PROCESS(clk, reset)
+begin
+    if (reset = '1') then
+        currentState <= IDLE;
+    elsif rising_edge (clk) then
+        currentState <= nextState;
+    end if;	
+end process;
+
+OUTPUT_MAX_INDEX_TRANSFORMATION : PROCESS(clk, reset)
+BEGIN
+    if reset = '1' or RESET_maxindex_counter = '1' THEN
+        maxindex_counter <= 0;
+        MAX_INDEX_8_bit <= X"00";
+    elsif rising_edge(clk) THEN
+        if output_maxindex = '1' THEN
+            if MAXINDEX_SIGNAL(maxindex_counter) = X"0" THEN
+                MAX_INDEX_8_bit <= "00110000";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"1" THEN
+                MAX_INDEX_8_bit <= "00110001";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"2" THEN
+                MAX_INDEX_8_bit <= "00110010";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"3" THEN
+                MAX_INDEX_8_bit <= "00110011";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"4" THEN
+                MAX_INDEX_8_bit <= "00110100";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"5" THEN
+                MAX_INDEX_8_bit <= "00110101";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"6" THEN
+                MAX_INDEX_8_bit <= "00110110";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"7" THEN
+                MAX_INDEX_8_bit <= "00110111";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"8" THEN
+                MAX_INDEX_8_bit <= "00111000";
+            elsif MAXINDEX_SIGNAL(maxindex_counter) = X"9" THEN
+                MAX_INDEX_8_bit <= "00111001";
+            end if;
+            maxindex_counter <= maxindex_counter + 1;
+        end if;  
+    end if;    
+
+END PROCESS;
+
+OUTPUT_COUNTER : PROCESS(clk, reset, list_resetcounter, list_counter, list_enable)
+BEGIN
+    if (reset = '1') or list_resetcounter = '1' THEN
+        list_counter <= 0;
+        list_enable <= '1';
+    elsif rising_edge(clk) THEN
+        if list_enable = '1' THEN
+            list_counter <= list_counter + 1;
+            list_enable <= '0';
+        end if;
+    end if;
+END PROCESS;
+
+TX_DATA_OUTPUT : PROCESS(clk, reset, rxdata, rxnow, byte, dataResults_signal, output_peak_values)
+BEGIN
+    if reset = '1' THEN
+        rxdone <= '0';
+        txData <= X"00";
+        start <= '0';
+    elsif rising_edge(clk) THEN
+        if seqdone = '1' THEN
+            start <= '0';
+        elsif rxNow = '1' and txdone = '1' THEN
+            txData <= RxData;
+            rxdone <= '1';
+        elsif list_enable = '1' THEN
+            txData <= dataResults_signal(list_counter);
+            rxdone <= '1';
+        elsif output_peak_values = '1' THEN
+            txData <= dataResults_signal(3);
+            rxdone <= '1';
+        elsif output_maxindex = '1' THEN
+            txData <= MAX_INDEX_8_bit;
+            rxdone <= '1';
+        elsif dataready = '1' THEN
+            txData <= byte;
+            rxdone <= '1';
+            start <= '0';
+        elsif counter_N = 0 and seqdone = '0' THEN
+            start <= '1';
+
+        elsif rxnow = '0' THEN
+            rxdone <= '0';
+        end if; 
+    end if;
+END PROCESS;
+
+TRANSIMISSION : PROCESS(clk, reset)
+BEGIN
+    if reset = '1' THEN
+        txnow <= '0';
+    elsif rising_edge(clk) THEN
+        if txdone = '1' and rxnow = '1' THEN
+            txnow <=  '1';
+        elsif txdone = '0' THEN
+            txnow <=  '0';
+        end if;
+   end if;
+END PROCESS;
+
+
+BYTE_COUNTER_LOGIC : PROCESS(clk, reset)
+BEGIN
+    if RESET_BYTE_COUNTER = '1' THEN
+        COUNTER_BYTE <= 0;
+    elsif rising_edge(clk) and ENABLE_BYTE_COUNTER = '1' THEN
+        COUNTER_BYTE <= COUNTER_BYTE + 1;
+        
+    end if;
+         
+END PROCESS;
+
+
+
+DOWN_COUNTER : PROCESS(clk, reset)
+BEGIN
+    if (reset = '1') or RESETcounter = '1' THEN
+        counter_N <= 3;
+    elsif resetBCD = '1' THEN
+        BCD <= (X"0", X"0", X"0");
+        TOTAL <= 0;
+    elsif rising_edge(clk) THEN
+        if enable_counter = '1' THEN
+            counter_N <= counter_N - 1;
+            if rxData = "00110000" THEN
+                BCD(counter_N-1) <= X"0";
+                INTEGER_STORED <= 0 * (10 ** counter_N);
+            elsif rxData = "00110001" THEN
+                BCD(counter_N-1) <= X"1";
+                INTEGER_STORED <= 1 * (10 ** counter_N);
+            elsif rxData = "00110010" THEN
+                BCD(counter_N-1) <= X"2";
+                INTEGER_STORED <= 2 * (10 ** counter_N);
+            elsif rxData = "00110011" THEN
+                BCD(counter_N-1) <= X"3";
+                INTEGER_STORED <= 3 * (10 ** counter_N);
+            elsif rxData = "00110100" THEN
+                BCD(counter_N-1) <= X"4";
+                INTEGER_STORED <= 4 * (10 ** counter_N);
+            elsif rxData = "00110101" THEN
+                BCD(counter_N-1) <= X"5";
+                INTEGER_STORED <= 5 * (10 ** counter_N);
+            elsif rxData = "00110110" THEN
+                BCD(counter_N-1) <= X"6";
+                INTEGER_STORED <= 6 * (10 ** counter_N);
+            elsif rxData = "00110111" THEN
+                BCD(counter_N-1) <= X"7";
+                INTEGER_STORED <= 7 * (10 ** counter_N);
+            elsif rxData = "00111000" THEN
+                BCD(counter_N-1) <= X"8"; 
+                INTEGER_STORED <= 8 * (10 ** counter_N);
+            elsif rxData = "00111001" THEN
+                BCD(counter_N-1) <= X"9"; 
+                INTEGER_STORED <= 9 * (10 ** counter_N);
+            end if;
+            
+            TOTAL <= TOTAL + INTEGER_STORED;
+         elsif counter_N = 0 THEN
+            numWords_bcd <= BCD;
+        end if;
+    end if;
+END PROCESS;
+
+
+end Behavioral;

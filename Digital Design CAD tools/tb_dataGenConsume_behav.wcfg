@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_dataGenConsume_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="common_pack" />
+            <top_module name="tb_dataGenConsume" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="214460615000001fs"></ZoomEndTime>
+      <Cursor1Time time="214460615000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="145"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="72" />
+   <wvobject fp_name="/tb_dataGenConsume/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_start" type="logic">
+      <obj_property name="ElementShortName">sig_start</obj_property>
+      <obj_property name="ObjectShortName">sig_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/ctrl_genDriv" type="logic">
+      <obj_property name="ElementShortName">ctrl_genDriv</obj_property>
+      <obj_property name="ObjectShortName">ctrl_genDriv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/ctrl_consDriv" type="logic">
+      <obj_property name="ElementShortName">ctrl_consDriv</obj_property>
+      <obj_property name="ObjectShortName">ctrl_consDriv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_dataReady" type="logic">
+      <obj_property name="ElementShortName">sig_dataReady</obj_property>
+      <obj_property name="ObjectShortName">sig_dataReady</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_seqDone" type="logic">
+      <obj_property name="ElementShortName">sig_seqDone</obj_property>
+      <obj_property name="ObjectShortName">sig_seqDone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_rxDone" type="logic">
+      <obj_property name="ElementShortName">sig_rxDone</obj_property>
+      <obj_property name="ObjectShortName">sig_rxDone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_rxNow" type="logic">
+      <obj_property name="ElementShortName">sig_rxNow</obj_property>
+      <obj_property name="ObjectShortName">sig_rxNow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_ovErr" type="logic">
+      <obj_property name="ElementShortName">sig_ovErr</obj_property>
+      <obj_property name="ObjectShortName">sig_ovErr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_framErr" type="logic">
+      <obj_property name="ElementShortName">sig_framErr</obj_property>
+      <obj_property name="ObjectShortName">sig_framErr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_txNow" type="logic">
+      <obj_property name="ElementShortName">sig_txNow</obj_property>
+      <obj_property name="ObjectShortName">sig_txNow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_txDone" type="logic">
+      <obj_property name="ElementShortName">sig_txDone</obj_property>
+      <obj_property name="ObjectShortName">sig_txDone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_rx" type="logic">
+      <obj_property name="ElementShortName">sig_rx</obj_property>
+      <obj_property name="ObjectShortName">sig_rx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_tx" type="logic">
+      <obj_property name="ElementShortName">sig_tx</obj_property>
+      <obj_property name="ObjectShortName">sig_tx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_rx_debug" type="logic">
+      <obj_property name="ElementShortName">sig_rx_debug</obj_property>
+      <obj_property name="ObjectShortName">sig_rx_debug</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_rxData" type="array">
+      <obj_property name="ElementShortName">sig_rxData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_rxData[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_txData" type="array">
+      <obj_property name="ElementShortName">sig_txData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_txData[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_byte" type="array">
+      <obj_property name="ElementShortName">sig_byte[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_byte[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_maxIndex" type="array">
+      <obj_property name="ElementShortName">sig_maxIndex[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_maxIndex[2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_dataResults" type="array">
+      <obj_property name="ElementShortName">sig_dataResults[0:6][7:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_dataResults[0:6][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_numWords_bcd" type="array">
+      <obj_property name="ElementShortName">sig_numWords_bcd[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_numWords_bcd[2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/sig_data" type="array">
+      <obj_property name="ElementShortName">sig_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">sig_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/seqCount" type="other">
+      <obj_property name="ElementShortName">seqCount</obj_property>
+      <obj_property name="ObjectShortName">seqCount</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/SEQ_COUNT_MAX" type="other">
+      <obj_property name="ElementShortName">SEQ_COUNT_MAX</obj_property>
+      <obj_property name="ObjectShortName">SEQ_COUNT_MAX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/RESULTS" type="array">
+      <obj_property name="ElementShortName">RESULTS[0:1][0:6][7:0]</obj_property>
+      <obj_property name="ObjectShortName">RESULTS[0:1][0:6][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/peak" type="array">
+      <obj_property name="ElementShortName">peak[0:1][2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">peak[0:1][2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/rxnow" type="logic">
+      <obj_property name="ElementShortName">rxnow</obj_property>
+      <obj_property name="ObjectShortName">rxnow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/rxData" type="array">
+      <obj_property name="ElementShortName">rxData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rxData[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/txData" type="array">
+      <obj_property name="ElementShortName">txData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">txData[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/rxdone" type="logic">
+      <obj_property name="ElementShortName">rxdone</obj_property>
+      <obj_property name="ObjectShortName">rxdone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/ovErr" type="logic">
+      <obj_property name="ElementShortName">ovErr</obj_property>
+      <obj_property name="ObjectShortName">ovErr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/framErr" type="logic">
+      <obj_property name="ElementShortName">framErr</obj_property>
+      <obj_property name="ObjectShortName">framErr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/txnow" type="logic">
+      <obj_property name="ElementShortName">txnow</obj_property>
+      <obj_property name="ObjectShortName">txnow</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/txdone" type="logic">
+      <obj_property name="ElementShortName">txdone</obj_property>
+      <obj_property name="ObjectShortName">txdone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/numWords_bcd" type="array">
+      <obj_property name="ElementShortName">numWords_bcd[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">numWords_bcd[2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/dataReady" type="logic">
+      <obj_property name="ElementShortName">dataReady</obj_property>
+      <obj_property name="ObjectShortName">dataReady</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/byte" type="array">
+      <obj_property name="ElementShortName">byte[7:0]</obj_property>
+      <obj_property name="ObjectShortName">byte[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/maxIndex" type="array">
+      <obj_property name="ElementShortName">maxIndex[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">maxIndex[2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/dataResults" type="array">
+      <obj_property name="ElementShortName">dataResults[0:6][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataResults[0:6][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/seqDone" type="logic">
+      <obj_property name="ElementShortName">seqDone</obj_property>
+      <obj_property name="ObjectShortName">seqDone</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/currentState" type="other">
+      <obj_property name="ElementShortName">currentState</obj_property>
+      <obj_property name="ObjectShortName">currentState</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/nextState" type="other">
+      <obj_property name="ElementShortName">nextState</obj_property>
+      <obj_property name="ObjectShortName">nextState</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/counter_N" type="other">
+      <obj_property name="ElementShortName">counter_N</obj_property>
+      <obj_property name="ObjectShortName">counter_N</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/COUNTER_BYTE" type="other">
+      <obj_property name="ElementShortName">COUNTER_BYTE</obj_property>
+      <obj_property name="ObjectShortName">COUNTER_BYTE</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/INTEGER_STORED" type="other">
+      <obj_property name="ElementShortName">INTEGER_STORED</obj_property>
+      <obj_property name="ObjectShortName">INTEGER_STORED</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/TOTAL" type="other">
+      <obj_property name="ElementShortName">TOTAL</obj_property>
+      <obj_property name="ObjectShortName">TOTAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/maxindex_counter" type="other">
+      <obj_property name="ElementShortName">maxindex_counter</obj_property>
+      <obj_property name="ObjectShortName">maxindex_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/BCD" type="array">
+      <obj_property name="ElementShortName">BCD[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">BCD[2:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/txData_peak" type="array">
+      <obj_property name="ElementShortName">txData_peak[7:0]</obj_property>
+      <obj_property name="ObjectShortName">txData_peak[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/txData_list" type="array">
+      <obj_property name="ElementShortName">txData_list[7:0]</obj_property>
+      <obj_property name="ObjectShortName">txData_list[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/MAX_INDEX_8_bit" type="array">
+      <obj_property name="ElementShortName">MAX_INDEX_8_bit[7:0]</obj_property>
+      <obj_property name="ObjectShortName">MAX_INDEX_8_bit[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/enable" type="logic">
+      <obj_property name="ElementShortName">enable</obj_property>
+      <obj_property name="ObjectShortName">enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/start_list_values" type="logic">
+      <obj_property name="ElementShortName">start_list_values</obj_property>
+      <obj_property name="ObjectShortName">start_list_values</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/output_peak_values" type="logic">
+      <obj_property name="ElementShortName">output_peak_values</obj_property>
+      <obj_property name="ObjectShortName">output_peak_values</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/output_maxindex" type="logic">
+      <obj_property name="ElementShortName">output_maxindex</obj_property>
+      <obj_property name="ObjectShortName">output_maxindex</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/RESET_maxindex_counter" type="logic">
+      <obj_property name="ElementShortName">RESET_maxindex_counter</obj_property>
+      <obj_property name="ObjectShortName">RESET_maxindex_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/RESETcounter" type="logic">
+      <obj_property name="ElementShortName">RESETcounter</obj_property>
+      <obj_property name="ObjectShortName">RESETcounter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/enable_counter" type="logic">
+      <obj_property name="ElementShortName">enable_counter</obj_property>
+      <obj_property name="ObjectShortName">enable_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/list_resetcounter" type="logic">
+      <obj_property name="ElementShortName">list_resetcounter</obj_property>
+      <obj_property name="ObjectShortName">list_resetcounter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/list_enable" type="logic">
+      <obj_property name="ElementShortName">list_enable</obj_property>
+      <obj_property name="ObjectShortName">list_enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/resetBCD" type="logic">
+      <obj_property name="ElementShortName">resetBCD</obj_property>
+      <obj_property name="ObjectShortName">resetBCD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/RESET_BYTE_COUNTER" type="logic">
+      <obj_property name="ElementShortName">RESET_BYTE_COUNTER</obj_property>
+      <obj_property name="ObjectShortName">RESET_BYTE_COUNTER</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/ENABLE_BYTE_COUNTER" type="logic">
+      <obj_property name="ElementShortName">ENABLE_BYTE_COUNTER</obj_property>
+      <obj_property name="ObjectShortName">ENABLE_BYTE_COUNTER</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/PRINT_OUTPUT" type="logic">
+      <obj_property name="ElementShortName">PRINT_OUTPUT</obj_property>
+      <obj_property name="ObjectShortName">PRINT_OUTPUT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/TX_SUCCESS" type="logic">
+      <obj_property name="ElementShortName">TX_SUCCESS</obj_property>
+      <obj_property name="ObjectShortName">TX_SUCCESS</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/list_counter" type="other">
+      <obj_property name="ElementShortName">list_counter</obj_property>
+      <obj_property name="ObjectShortName">list_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/DATARESULTS_SIGNAL" type="array">
+      <obj_property name="ElementShortName">DATARESULTS_SIGNAL[0:6][7:0]</obj_property>
+      <obj_property name="ObjectShortName">DATARESULTS_SIGNAL[0:6][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataGenConsume/cmdProc1/MAXINDEX_SIGNAL" type="array">
+      <obj_property name="ElementShortName">MAXINDEX_SIGNAL[2:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">MAXINDEX_SIGNAL[2:0][3:0]</obj_property>
+   </wvobject>
+</wave_config>
