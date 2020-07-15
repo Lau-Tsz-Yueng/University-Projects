@@ -9,3 +9,4 @@ Including:
 
 1. Data & Command Processor -> [click here](https://github.com/Lau-Tsz-Yueng/University-Projects/tree/master/Digital%20Design%20CAD%20tools)
 2. Ultasonic Range Finder -> [click here](https://github.com/Lau-Tsz-Yueng/University-Projects/tree/master/Ultrasonic%20Range%20Finder)
+3. Polynomial Solver -> [click here](https://github.com/Lau-Tsz-Yueng/University-Projects/tree/master/polynomial%20solver-1.0)
