@@ -2,7 +2,7 @@
 // Programme description is writting in README.txt
 
 // Unit: Further Computer Programming
-// Assignment name: Resit EMAT10006
+// Assignment name: EMAT10006
 // Date Created: 28 July 2019
 // Author: Liu Ziyang
 // Version: 1.0 (fixed for test)
